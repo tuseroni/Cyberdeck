@@ -1,0 +1,116 @@
+<html><head>
+    <script>
+    function toggleRez(elem)
+    {
+        var resBtn=elem;
+        if(resBtn.classList.contains("rezed"))
+        {
+            resBtn.classList.remove('rezed');
+            resBtn.classList.add('derezed');
+        }
+        else if(resBtn.classList.contains("derezed"))
+        {
+            resBtn.classList.remove('derezed');
+        }
+        else
+        {
+            resBtn.classList.add('rezed');
+        }
+    }
+    
+    </script>
+    <style>
+    .chip
+    {
+      width: 76px;
+      height: 77px;
+      background-position-y: -20px;
+      background-repeat: no-repeat;
+    }
+    .armour
+    {
+        background-image:url('armour.png');
+    }
+    .deckkrash
+    {
+        background-image:url('DeckKrash.png');
+    }
+    .sword
+    {
+        background-image:url('sword.png');
+    }
+    .eraser
+    {
+        background-image:url('eraser.png');
+    }
+    .cya
+    {
+        background-image:url('cya.png');
+    }
+    .worm
+    {
+        background-image:url('worm.png');
+    }
+    .banhammer
+    {
+        background-image:url('banhammer.png');
+    }
+    .rezbtn
+    {
+        width: 16px;
+        height: 20px;
+        position: relative;
+        top: -52px;
+        left: 88px;
+    }
+    .rezed
+    {
+        background-color:green;
+    }
+    .derezed
+    {
+        background-color:red;
+    }
+    
+    </style>
+  </head>
+  <body>
+        <div id="display" style="background-image:url('bg.gif');width:672px;height:889px">
+        <div class="chip armour" style="position: absolute;top: 594px;left: 65px;"></div>
+        <div class="chip deckkrash" style="position: absolute;top: 683px;left: 65px;"></div>
+        <div class="chip sword" style="position: absolute;top: 594px;left: 154px;"></div>
+        <div class="chip eraser" style="position: absolute;top: 683px;left: 154px;"></div>
+        <div class="chip cya" style="position: absolute;top: 594px;left: 243px;"></div>
+        <div class="chip worm" style="position: absolute;top: 594px;left: 331px;"></div>
+        <div class="chip banhammer" style="position: absolute;top: 594px;left: 420px;"></div>
+        
+        <div id="sidebar">
+          <div id="slot1" style="position: absolute;top: 151px;left: 553px;">
+            <div class="chip armour"></div>
+            <div class="rezbtn" onclick="toggleRez(this);"></div>
+          </div>
+          <div id="slot2" style="position: absolute;top: 239px;left: 553px;">
+            <div class="chip sword"></div>
+            <div class="rezbtn" onclick="toggleRez(this);"></div>
+          </div>
+          <div id="slot3" style="position: absolute;top: 328px;left: 553px;">
+            <div class="chip cya"></div>
+            <div class="rezbtn" onclick="toggleRez(this);"></div>
+          </div>
+          <div id="slot4" style="position: absolute;top: 418px;left: 553px;">
+            <div class="chip worm""></div>
+            <div class="rezbtn" onclick="toggleRez(this);"></div>
+          </div>
+          <div id="slot5" style="position: absolute;top: 507px;left: 553px;">
+            <div class="chip banhammer"></div>
+            <div class="rezbtn" onclick="toggleRez(this);"></div>
+          </div>
+          
+          
+        </div>
+         
+        </div>
+        
+  
+
+</body></html>
