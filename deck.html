@@ -1,6 +1,17 @@
 <!doctype html>
 <html><head>
     <script>
+	var programs=[{"name":"Blank","attack":0,"defence":0,"class":"","maxRez":0,"curRez":0,"effect":""},
+	{"name":"Armor","attack":0,"defence":0,"class":"armour","maxRez":7,"curRez":7,"effect":"Lowers all brain damage you would receive by 4, as long as this Program remains Rezzed. Only 1 copy of this Program can be running at a time. Each copy of this Program can only be used once per Netrun."},
+	{"name":"sword","attack":1,"defence":0,"class":"sword","maxRez":0,"curRez":0,"effect":"Does 3d6 REZ to a Black ICE Program, or 2d6 REZ to a Non-Black ICE Program"},
+	{"name":"See Ya","attack":0,"defence":0,"class":"cya","maxRez":7,"curRez":7,"effect":"Increases all Pathfinder Checks you make by +2 as long as this Prgram remains Rezzed"},
+	{"name":"worm","attack":0,"defence":0,"class":"worm","maxRez":7,"curRez":7,"effect":"Increases all Backdoor Checks you make by +2 as long as this Prgram remains Rezzed"},
+	{"name":"Banhammer","attack":1,"defence":0,"class":"banhammer","maxRez":0,"curRez":0,"effect":"Does 3d6 REZ to a Non-Black ICE Program, or 2d6 REZ to a Black-ICE Program"},
+	{"name":"DeckKRASH","attack":0,"defence":0,"class":"deckkrash","maxRez":0,"curRez":0,"effect":"Enemy Netrunner is forcibly and unsafely Jacked Out of the Architecture, suffering the effect of all Rezzed enemy Black ICE they've encountered in the Architecture as they leave."},
+	{"name":"Eraser","attack":0,"defence":0,"class":"eraser","maxRez":7,"curRez":7,"effect":"Increases all Cloak Checks you make by +2 as long as this Program remains Rezzed."},
+	{"name":"sword","attack":1,"defence":0,"class":"sword","maxRez":0,"curRez":0,"effect":"Does 3d6 REZ to a Black ICE Program, or 2d6 REZ to a Non-Black ICE Program"},
+	]
+	/*
 	var slots=[
 	{"name":"Blank","attack":0,"defence":0,"class":"","maxRez":0,"curRez":0},
 	{"name":"Armor","attack":0,"defence":0,"class":"armour","maxRez":7,"curRez":7},
@@ -8,6 +19,16 @@
 	{"name":"See Ya","attack":0,"defence":0,"class":"cya","maxRez":7,"curRez":7},
 	{"name":"worm","attack":0,"defence":0,"class":"worm","maxRez":7,"curRez":7},
 	{"name":"banhammer","attack":1,"defence":0,"class":"banhammer","maxRez":0,"curRez":0}
+	];
+	*/
+	
+	var slots=[
+	{"name":"Blank","attack":0,"defence":0,"class":"blank","maxRez":0,"curRez":0,"effect":""},
+	{"name":"Blank","attack":0,"defence":0,"class":"blank","maxRez":0,"curRez":0,"effect":""},
+	{"name":"Blank","attack":0,"defence":0,"class":"blank","maxRez":0,"curRez":0,"effect":""},
+	{"name":"Blank","attack":0,"defence":0,"class":"blank","maxRez":0,"curRez":0,"effect":""},
+	{"name":"Blank","attack":0,"defence":0,"class":"blank","maxRez":0,"curRez":0,"effect":""},
+	{"name":"Blank","attack":0,"defence":0,"class":"blank","maxRez":0,"curRez":0,"effect":""},
 	];
 	var activeSlot=slots[0];
     function toggleRez(elem)
@@ -41,6 +62,7 @@
 		var atk=document.getElementById("atk");
 		var def=document.getElementById("def");
 		var rez=document.getElementById("rez");
+		var effect=document.getElementById("effect");
 		var maxRez=document.getElementById("maxRez");
 		
 		ms.className="mainSection";
@@ -55,6 +77,34 @@
 		maxRez.innerHTML="/ "+slot.maxRez;
 		rez.value=slot.curRez;
 		rez.max=slot.maxRez;
+		effect.innerHTML=slot.effect;
+	}
+	function fillSideBar()
+	{
+		for(var i=1;i<slots.length;i++)
+		{
+			var slot=document.querySelectorAll("#slot"+i+" .chip")[0];
+			slot.className="chip";
+			if(slot.class != "")
+			{
+				slot.classList.add(slots[i].class);
+			}
+		}
+	}
+	function addToSideBar(elem)
+	{
+		var id=parseInt(elem.getAttribute("data-prog"));
+		var prog=programs[id];
+		var nextOpen=document.querySelectorAll("#sidebar .chip.blank");
+		if(nextOpen.length==0)
+		{
+			return;
+		}
+		var slotElem=nextOpen[0].parentElement;
+		var slotID=slotElem.id.replace("slot","");
+		slots[slotID]=JSON.parse(JSON.stringify(prog));
+		fillSideBar();
+		
 	}
 	function reduceCur(elem)
 	{
@@ -142,55 +192,57 @@
   </head>
   <body>
 		<div id="display" style="background-image:url('bg.gif');width:672px;height:889px">
-			<div class="" style="position: absolute;top: 64px;left: 130px;color: white;text-shadow: 0 0 9px black;"><h1 id="name"></h1>
-		</div>
-        <div class="" style="position: absolute;top: 432px;left: 68px;color: white;text-shadow: 0 0 9px black;">
-			<h1 style="margin-bottom: 1px;">Atk</h1>
-			<h1 id="atk" style="margin-top: 0px;margin-left: 14px;">0</h1>
-		</div>
-		<div class="" style="position: absolute;top: 432px;left: 161px;color: white;text-shadow: 0 0 9px black;"><h1 style="margin-bottom: 1px;">Def</h1>
-			<h1 id="def" style="margin-top: 0px;margin-left: 14px;">0</h1>
-		</div>
-		<div class="" style="position: absolute;top: 432px;left: 310px;color: white;text-shadow: 0 0 9px black;">
-			<h1 style="margin-bottom: 1px;">Rez</h1>
-			<input type="number" min="0" max="7" id="rez" style="width: 31px;height: 33px;position: relative;top: 	-2px;font-size: 2em;left: -6px;" onchange="reduceCur(this)">
-			<label id="maxRez" style="font-size: 2em;margin-block-start: 0.67em;margin-block-end: 0.67em;margin-inline-start: 0px;margin-inline-end: 0px;font-weight: bold;">/ 0</label>
-		</div>
-		<div id="mainSection" class="mainSection chip " style="position: absolute;top: 138px;left: 65px;"></div><div class="chip armour" style="position: absolute;top: 594px;left: 65px;"></div>
-        <div class="chip deckkrash" style="position: absolute;top: 683px;left: 65px;"></div>
-        <div class="chip sword" style="position: absolute;top: 594px;left: 154px;"></div>
-        <div class="chip eraser" style="position: absolute;top: 683px;left: 154px;"></div>
-        <div class="chip cya" style="position: absolute;top: 594px;left: 243px;"></div>
-        <div class="chip worm" style="position: absolute;top: 594px;left: 331px;"></div>
-        <div class="chip banhammer" style="position: absolute;top: 594px;left: 420px;"></div>
-        
-        <div id="sidebar">
-          <div id="slot1" style="position: absolute;top: 151px;left: 553px;">
-            <div class="chip armour" onclick="CheckInfo(this)"></div>
-            <div class="rezbtn" onclick="toggleRez(this);"></div>
-          </div>
-          <div id="slot2" style="position: absolute;top: 239px;left: 553px;">
-            <div class="chip sword" onclick="CheckInfo(this)"></div>
-            <div class="rezbtn" onclick="toggleRez(this);"></div>
-          </div>
-          <div id="slot3" style="position: absolute;top: 328px;left: 553px;">
-            <div class="chip cya" onclick="CheckInfo(this)"></div>
-            <div class="rezbtn" onclick="toggleRez(this);"></div>
-          </div>
-          <div id="slot4" style="position: absolute;top: 418px;left: 553px;">
-            <div class="chip worm" onclick="CheckInfo(this)"></div>
-            <div class="rezbtn" onclick="toggleRez(this);"></div>
-          </div>
-          <div id="slot5" style="position: absolute;top: 507px;left: 553px;">
-            <div class="chip banhammer" onclick="CheckInfo(this)"></div>
-            <div class="rezbtn" onclick="toggleRez(this);"></div>
-          </div>
-          
-          
-        </div>
+			<div class="" style="position: absolute;top: 28px;left: 181px;color: white;text-shadow: 0 0 9px black;"><h1 id="name"></h1></div>
+			<div class="" style="position: absolute;top: 67px;left: 34px;color: white;text-shadow: 0 0 9px black;width: 409px;height: 74px;overflow: auto;"><h3 id="effect" style="font-size: 13px;text-align: center;"></h3></div>
+			<div class="" style="position: absolute;top: 432px;left: 68px;color: white;text-shadow: 0 0 9px black;">
+				<h1 style="margin-bottom: 1px;">Atk</h1>
+				<h1 id="atk" style="margin-top: 0px;margin-left: 14px;">0</h1>
+			</div>
+			<div class="" style="position: absolute;top: 432px;left: 161px;color: white;text-shadow: 0 0 9px black;"><h1 style="margin-bottom: 1px;">Def</h1>
+				<h1 id="def" style="margin-top: 0px;margin-left: 14px;">0</h1>
+			</div>
+			<div class="" style="position: absolute;top: 432px;left: 310px;color: white;text-shadow: 0 0 9px black;">
+				<h1 style="margin-bottom: 1px;">Rez</h1>
+				<input type="number" min="0" max="7" id="rez" style="width: 31px;height: 33px;position: relative;top: 	-2px;font-size: 2em;left: -6px;" onchange="reduceCur(this)">
+				<label id="maxRez" style="font-size: 2em;margin-block-start: 0.67em;margin-block-end: 0.67em;margin-inline-start: 0px;margin-inline-end: 0px;font-weight: bold;">/ 0</label>
+			</div>
+			<div id="mainSection" class="mainSection chip " style="position: absolute;top: 138px;left: 65px;"></div>
+			<div class="chip armour" onclick="addToSideBar(this)" data-prog="1" style="position: absolute;top: 594px;left: 65px;"></div>
+			<div class="chip deckkrash" onclick="addToSideBar(this)" data-prog="6" style="position: absolute;top: 683px;left: 65px;"></div>
+			<div class="chip sword" onclick="addToSideBar(this)"  data-prog="2" style="position: absolute;top: 594px;left: 154px;"></div>
+			<div class="chip eraser" onclick="addToSideBar(this)" data-prog="7" style="position: absolute;top: 683px;left: 154px;"></div>
+			<div class="chip cya" onclick="addToSideBar(this)" data-prog="3" style="position: absolute;top: 594px;left: 243px;"></div>
+			<div class="chip worm" onclick="addToSideBar(this)" data-prog="4" style="position: absolute;top: 594px;left: 331px;"></div>
+			<div class="chip banhammer" onclick="addToSideBar(this)" data-prog="5" style="position: absolute;top: 594px;left: 420px;"></div>
+			<div class="chip sword" onclick="addToSideBar(this)"  data-prog="8" style="position: absolute;top: 683px;left: 243px;"></div>
+			
+			<div id="sidebar">
+			  <div id="slot1" style="position: absolute;top: 151px;left: 553px;">
+				<div class="chip" onclick="CheckInfo(this)"></div>
+				<div class="rezbtn" onclick="toggleRez(this);"></div>
+			  </div>
+			  <div id="slot2" style="position: absolute;top: 239px;left: 553px;">
+				<div class="chip" onclick="CheckInfo(this)"></div>
+				<div class="rezbtn" onclick="toggleRez(this);"></div>
+			  </div>
+			  <div id="slot3" style="position: absolute;top: 328px;left: 553px;">
+				<div class="chip" onclick="CheckInfo(this)"></div>
+				<div class="rezbtn" onclick="toggleRez(this);"></div>
+			  </div>
+			  <div id="slot4" style="position: absolute;top: 418px;left: 553px;">
+				<div class="chip" onclick="CheckInfo(this)"></div>
+				<div class="rezbtn" onclick="toggleRez(this);"></div>
+			  </div>
+			  <div id="slot5" style="position: absolute;top: 507px;left: 553px;">
+				<div class="chip" onclick="CheckInfo(this)"></div>
+				<div class="rezbtn" onclick="toggleRez(this);"></div>
+			  </div>
+			</div>
          
         </div>
         
   
-
+<script>
+fillSideBar();
+</script>
 </body></html>
