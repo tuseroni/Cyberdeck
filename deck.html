@@ -1,5 +1,14 @@
+<!doctype html>
 <html><head>
     <script>
+	var slots=[
+	{"name":"Blank","attack":0,"defence":0,"class":"","maxRez":0,"curRez":0},
+	{"name":"Armor","attack":0,"defence":0,"class":"armour","maxRez":7,"curRez":7},
+	{"name":"sword","attack":1,"defence":0,"class":"sword","maxRez":0,"curRez":0},
+	{"name":"See Ya","attack":0,"defence":0,"class":"cya","maxRez":7,"curRez":7},
+	{"name":"worm","attack":0,"defence":0,"class":"worm","maxRez":7,"curRez":7},
+	{"name":"banhammer","attack":1,"defence":0,"class":"banhammer","maxRez":0,"curRez":0}
+	];
     function toggleRez(elem)
     {
         var resBtn=elem;
@@ -17,7 +26,31 @@
             resBtn.classList.add('rezed');
         }
     }
-    
+    function CheckInfo(elem)
+	{
+		var slotNum=elem.parentElement.id.replace("slot","");
+		var ms=document.getElementById("mainSection");
+		var name=document.getElementById("name");
+		var atk=document.getElementById("atk");
+		var def=document.getElementById("def");
+		var rez=document.getElementById("rez");
+		var maxRez=document.getElementById("maxRez");
+		var slot=slots[slotNum];
+		ms.className="mainSection";
+		if(slots[slotNum].class != "")
+		{
+			ms.classList.add("chip")
+			ms.classList.add(slots[slotNum].class)
+		}
+		name.innerHTML=slot.name;
+		atk.innerHTML=slot.attack;
+		def.innerHTML=slot.defence;
+		maxRez.innerHTML=slot.maxRez;
+		rez.value=slot.curRez;
+		rez.max=slot.maxRez;
+		
+	}
+	
     </script>
     <style>
     .chip
@@ -71,12 +104,33 @@
     {
         background-color:red;
     }
+	.chip.mainSection
+	{
+		background-size: 333px;
+		background-position-y: -85px;
+		width: 333px;
+		height: 300px;
+	}
     
     </style>
   </head>
   <body>
         <div id="display" style="background-image:url('bg.gif');width:672px;height:889px">
-        <div class="chip armour" style="position: absolute;top: 594px;left: 65px;"></div>
+		<div class="" style="position: absolute;top: 64px;left: 130px;color: white;text-shadow: 0 0 9px black;"><h1 id="name">Banhammer</h1></div>
+        <div class="" style="position: absolute;top: 432px;left: 68px;color: white;text-shadow: 0 0 9px black;"><h1 style="
+    margin-bottom: 1px;
+">Atk</h1><h1 id="atk" style="
+    margin-top: 0px;
+    margin-left: 14px;
+">0</h1></div><div class="" style="position: absolute;top: 432px;left: 161px;color: white;text-shadow: 0 0 9px black;"><h1 style="
+    margin-bottom: 1px;
+">Def</h1><h1 id="def" style="
+    margin-top: 0px;
+    margin-left: 14px;
+">0</h1></div><div class="" style="position: absolute;top: 432px;left: 310px;color: white;text-shadow: 0 0 9px black;"><h1 style="
+    margin-bottom: 1px;
+">Rez</h1>
+<input type="number" min=0 max=7 id="rez"><label id="maxRez" style="margin-top: 0px;margin-left: 7px;"></h1></div><div id="mainSection" class="mainSection chip banhammer" style="position: absolute;top: 138px;left: 65px;"></div><div class="chip armour" style="position: absolute;top: 594px;left: 65px;"></div>
         <div class="chip deckkrash" style="position: absolute;top: 683px;left: 65px;"></div>
         <div class="chip sword" style="position: absolute;top: 594px;left: 154px;"></div>
         <div class="chip eraser" style="position: absolute;top: 683px;left: 154px;"></div>
@@ -86,23 +140,23 @@
         
         <div id="sidebar">
           <div id="slot1" style="position: absolute;top: 151px;left: 553px;">
-            <div class="chip armour"></div>
+            <div class="chip armour" onclick="CheckInfo(this)"></div>
             <div class="rezbtn" onclick="toggleRez(this);"></div>
           </div>
           <div id="slot2" style="position: absolute;top: 239px;left: 553px;">
-            <div class="chip sword"></div>
+            <div class="chip sword" onclick="CheckInfo(this)"></div>
             <div class="rezbtn" onclick="toggleRez(this);"></div>
           </div>
           <div id="slot3" style="position: absolute;top: 328px;left: 553px;">
-            <div class="chip cya"></div>
+            <div class="chip cya" onclick="CheckInfo(this)"></div>
             <div class="rezbtn" onclick="toggleRez(this);"></div>
           </div>
           <div id="slot4" style="position: absolute;top: 418px;left: 553px;">
-            <div class="chip worm""></div>
+            <div class="chip worm" onclick="CheckInfo(this)"></div>
             <div class="rezbtn" onclick="toggleRez(this);"></div>
           </div>
           <div id="slot5" style="position: absolute;top: 507px;left: 553px;">
-            <div class="chip banhammer"></div>
+            <div class="chip banhammer" onclick="CheckInfo(this)"></div>
             <div class="rezbtn" onclick="toggleRez(this);"></div>
           </div>
           
