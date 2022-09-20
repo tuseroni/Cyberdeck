@@ -9,6 +9,7 @@
 	{"name":"worm","attack":0,"defence":0,"class":"worm","maxRez":7,"curRez":7},
 	{"name":"banhammer","attack":1,"defence":0,"class":"banhammer","maxRez":0,"curRez":0}
 	];
+	var activeSlot=slots[0];
     function toggleRez(elem)
     {
         var resBtn=elem;
@@ -29,18 +30,24 @@
     function CheckInfo(elem)
 	{
 		var slotNum=elem.parentElement.id.replace("slot","");
+		var slot=slots[slotNum];
+		fillInfo(slot);
+		activeSlot=slot;
+	}
+	function fillInfo(slot)
+	{
 		var ms=document.getElementById("mainSection");
 		var name=document.getElementById("name");
 		var atk=document.getElementById("atk");
 		var def=document.getElementById("def");
 		var rez=document.getElementById("rez");
 		var maxRez=document.getElementById("maxRez");
-		var slot=slots[slotNum];
+		
 		ms.className="mainSection";
-		if(slots[slotNum].class != "")
+		if(slot.class != "")
 		{
 			ms.classList.add("chip")
-			ms.classList.add(slots[slotNum].class)
+			ms.classList.add(slot.class)
 		}
 		name.innerHTML=slot.name;
 		atk.innerHTML=slot.attack;
@@ -48,7 +55,26 @@
 		maxRez.innerHTML="/ "+slot.maxRez;
 		rez.value=slot.curRez;
 		rez.max=slot.maxRez;
-		
+	}
+	function reduceCur(elem)
+	{
+		var CurRez=elem.value;
+		activeSlot.curRez=CurRez;
+		fillInfo(activeSlot);
+		var btn=document.querySelectorAll("#slot"+slots.indexOf(activeSlot)+" .rezbtn")[0];
+		if(activeSlot.curRez==0)
+		{
+			if(btn.classList.contains("rezed"))
+			{
+				btn.classList.remove("rezed");
+				btn.classList.add("derezed");			
+			}
+		}
+		else if(btn.classList.contains("derezed"))
+		{
+			btn.classList.remove("derezed");
+			btn.classList.add("rezed");			
+		}
 	}
 	
     </script>
@@ -115,37 +141,22 @@
     </style>
   </head>
   <body>
-        <div id="display" style="background-image:url('bg.gif');width:672px;height:889px">
-		<div class="" style="position: absolute;top: 64px;left: 130px;color: white;text-shadow: 0 0 9px black;"><h1 id="name"></h1></div>
-        <div class="" style="position: absolute;top: 432px;left: 68px;color: white;text-shadow: 0 0 9px black;"><h1 style="
-    margin-bottom: 1px;
-">Atk</h1><h1 id="atk" style="
-    margin-top: 0px;
-    margin-left: 14px;
-">0</h1></div><div class="" style="position: absolute;top: 432px;left: 161px;color: white;text-shadow: 0 0 9px black;"><h1 style="
-    margin-bottom: 1px;
-">Def</h1><h1 id="def" style="
-    margin-top: 0px;
-    margin-left: 14px;
-">0</h1></div><div class="" style="position: absolute;top: 432px;left: 310px;color: white;text-shadow: 0 0 9px black;"><h1 style="
-    margin-bottom: 1px;
-">Rez</h1>
-<input type="number" min="0" max="7" id="rez" style="
-    width: 31px;
-    height: 33px;
-    position: relative;
-    top: -2px;
-    font-size: 2em;
-    left: -6px;
-"><label id="maxRez" style="
-    /* display: block; */
-    font-size: 2em;
-    margin-block-start: 0.67em;
-    margin-block-end: 0.67em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
-    font-weight: bold;
-">/ 7</label></div><div id="mainSection" class="mainSection chip " style="position: absolute;top: 138px;left: 65px;"></div><div class="chip armour" style="position: absolute;top: 594px;left: 65px;"></div>
+		<div id="display" style="background-image:url('bg.gif');width:672px;height:889px">
+			<div class="" style="position: absolute;top: 64px;left: 130px;color: white;text-shadow: 0 0 9px black;"><h1 id="name"></h1>
+		</div>
+        <div class="" style="position: absolute;top: 432px;left: 68px;color: white;text-shadow: 0 0 9px black;">
+			<h1 style="margin-bottom: 1px;">Atk</h1>
+			<h1 id="atk" style="margin-top: 0px;margin-left: 14px;">0</h1>
+		</div>
+		<div class="" style="position: absolute;top: 432px;left: 161px;color: white;text-shadow: 0 0 9px black;"><h1 style="margin-bottom: 1px;">Def</h1>
+			<h1 id="def" style="margin-top: 0px;margin-left: 14px;">0</h1>
+		</div>
+		<div class="" style="position: absolute;top: 432px;left: 310px;color: white;text-shadow: 0 0 9px black;">
+			<h1 style="margin-bottom: 1px;">Rez</h1>
+			<input type="number" min="0" max="7" id="rez" style="width: 31px;height: 33px;position: relative;top: 	-2px;font-size: 2em;left: -6px;" onchange="reduceCur(this)">
+			<label id="maxRez" style="font-size: 2em;margin-block-start: 0.67em;margin-block-end: 0.67em;margin-inline-start: 0px;margin-inline-end: 0px;font-weight: bold;">/ 0</label>
+		</div>
+		<div id="mainSection" class="mainSection chip " style="position: absolute;top: 138px;left: 65px;"></div><div class="chip armour" style="position: absolute;top: 594px;left: 65px;"></div>
         <div class="chip deckkrash" style="position: absolute;top: 683px;left: 65px;"></div>
         <div class="chip sword" style="position: absolute;top: 594px;left: 154px;"></div>
         <div class="chip eraser" style="position: absolute;top: 683px;left: 154px;"></div>
