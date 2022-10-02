@@ -17,16 +17,17 @@ namespace WindowsFormsApp2
         SerialPort _serialPort = new SerialPort("COM5", 9600, Parity.None, 8, StopBits.One);
         Dictionary<string, Image> classes = new Dictionary<string, Image>()
         {
+            {"blank",Properties.Resources.alpha1 },
             {"sword",Properties.Resources.sword },
-            {"armour",Properties.Resources.sword },
-            {"deckkrash",Properties.Resources.sword },
-            {"eraser",Properties.Resources.sword },
-            {"cya",Properties.Resources.sword },
-            {"worm",Properties.Resources.sword },
-            {"banhammer",Properties.Resources.sword }
+            {"armour",Properties.Resources.armour },
+            {"deckkrash",Properties.Resources.DeckKrash },
+            {"eraser",Properties.Resources.eraser },
+            {"cya",Properties.Resources.cya },
+            {"worm",Properties.Resources.worm },
+            {"banhammer",Properties.Resources.banhammer}
         };
         prog[] allPrograms = {
-            new prog(){name="Blank", attack=0, defence=0, Class="", maxRez=0, curRez=0, effect=""},
+            new prog(){name="Blank", attack=0, defence=0, Class="blank", maxRez=0, curRez=0, effect=""},
     new prog(){name="Armor",attack=0,defence=0,Class="armour",maxRez=7,curRez=7,effect="Lowers all brain damage you would receive by 4, as long as this Program remains Rezzed. Only 1 copy of this Program can be running at a time. Each copy of this Program can only be used once per Netrun."},
     new prog() { name="sword",attack=1,defence=0,Class="sword",maxRez=0,curRez=0,effect="Does 3d6 REZ to a Black ICE Program, or 2d6 REZ to a Non-Black ICE Program"},
     new prog() { name="See Ya",attack=0,defence=0,Class="cya",maxRez=7,curRez=7,effect="Increases all Pathfinder Checks you make by +2 as long as this Program remains Rezzed"},
@@ -69,18 +70,26 @@ namespace WindowsFormsApp2
                 MessageBox.Show("Error opening/writing to serial port :: " + ex.Message, "Error!");
             }
         }
-        private delegate void SetTextDeleg(string text);
-        private void si_DataReceived(string data) 
-        { 
-            
+        private delegate void SetTextDeleg(byte[] text);
+        private void si_DataReceived(byte[] data) 
+        {
+            var port = data[0];
+            if (port == 0xff)
+            {
+                port = 0;
+            }
+            var program = allPrograms[port];
+            pictureBox2.Image = classes[program.Class];
         }
         private void sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             Thread.Sleep(500);
-            string data = _serialPort.ReadLine();
+            byte[] buff = new byte[7];
+            _serialPort.Read(buff, 0, 7);
+            
             // Invokes the delegate on the UI thread, and sends the data that was received to the invoked method.  
             // ---- The "si_DataReceived" method will be executed on the UI thread which allows populating of the textbox.  
-            this.BeginInvoke(new SetTextDeleg(si_DataReceived), new object[] { data });
+            this.BeginInvoke(new SetTextDeleg(si_DataReceived), new object[] { buff });
         }
 
         int[] states = { 0, 0, 0, 0, 0 };
