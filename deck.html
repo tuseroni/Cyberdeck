@@ -1,7 +1,7 @@
 <!doctype html>
 <html><head>
     <script>
-	var programs=[{"name":"Blank","attack":0,"defence":0,"class":"","maxRez":0,"curRez":0,"effect":""},
+	var allPrograms=[{"name":"Blank","attack":0,"defence":0,"class":"","maxRez":0,"curRez":0,"effect":""},
 	{"name":"Armor","attack":0,"defence":0,"class":"armour","maxRez":7,"curRez":7,"effect":"Lowers all brain damage you would receive by 4, as long as this Program remains Rezzed. Only 1 copy of this Program can be running at a time. Each copy of this Program can only be used once per Netrun."},
 	{"name":"sword","attack":1,"defence":0,"class":"sword","maxRez":0,"curRez":0,"effect":"Does 3d6 REZ to a Black ICE Program, or 2d6 REZ to a Non-Black ICE Program"},
 	{"name":"See Ya","attack":0,"defence":0,"class":"cya","maxRez":7,"curRez":7,"effect":"Increases all Pathfinder Checks you make by +2 as long as this Program remains Rezzed"},
@@ -9,8 +9,17 @@
 	{"name":"Banhammer","attack":1,"defence":0,"class":"banhammer","maxRez":0,"curRez":0,"effect":"Does 3d6 REZ to a Non-Black ICE Program, or 2d6 REZ to a Black-ICE Program"},
 	{"name":"DeckKRASH","attack":0,"defence":0,"class":"deckkrash","maxRez":0,"curRez":0,"effect":"Enemy Netrunner is forcibly and unsafely Jacked Out of the Architecture, suffering the effect of all Rezzed enemy Black ICE they've encountered in the Architecture as they leave."},
 	{"name":"Eraser","attack":0,"defence":0,"class":"eraser","maxRez":7,"curRez":7,"effect":"Increases all Cloak Checks you make by +2 as long as this Program remains Rezzed."},
-	{"name":"sword","attack":1,"defence":0,"class":"sword","maxRez":0,"curRez":0,"effect":"Does 3d6 REZ to a Black ICE Program, or 2d6 REZ to a Non-Black ICE Program"},
-	]
+	{"name":"Flak","attack":0,"defence":0,"class":"speedy","maxRez":7,"curRez":7,"effect":"Reduces the ATK of all Non-Black ICE Attacker Programs run against you to 0 as long as this Program remains Rezzed. Only 1 copy of this Program can be running at a time. Each copy of this Program can only be used once per Netrun."},
+	{"name":"Speedy Gonzalvez","attack":0,"defence":0,"class":"speedy","maxRez":7,"curRez":7,"effect":"Increases your Speed by +2 as long as this Program remains Rezzed."},
+	{"name":"Shield","attack":0,"defence":0,"class":"speedy","maxRez":7,"curRez":7,"effect":"Stops the first successful Non-Black ICE Program Effect from dealing brain damage. After stopping this damage, the Shield Derezzes itself. Only 1 copy of this Program can be running at a time. Each copy of this Program can only be used once per Netrun"},
+	{"name":"HellBolt","attack":2,"defence":0,"class":"speedy","maxRez":0,"curRez":0,"effect":"Does 2d6 Damage direct to the enemy Netrunner's brain. Unless insulated, their Cyberdeck catches fire along with their clothing. Until they spend a Meat Action to put themselves out, they take 2 damage to their HP whenever they end their Turn. Multiple instances of this effect cannot stack."},
+	{"name":"Nervescrub","attack":0,"defence":0,"class":"speedy","maxRez":0,"curRez":0,"effect":"Enemy Netrunner's INT, REF, and DEX are each lowered by 1d6 for the next hour (minimum 1). The effects are largely psychosomatic and leave no permanent effects."},
+	{"name":"Poison Flatline","attack":0,"defence":0,"class":"speedy","maxRez":0,"curRez":0,"effect":"Destroys a single Non-Black ICE Program installed on the Netrunner target's Cyberdeck at random."},
+	{"name":"Superglue","attack":2,"defence":0,"class":"speedy","maxRez":0,"curRez":0,"effect":"Enemy Netrunner cannot progress deeper into the Architecture or Jack Out safely for 1d6 Rounds (enemy Netrunner can still perform an unsafe Jack Out, though). Each copy of this Program can only be used once per Netrun."},
+	{"name":"Vrizbolt","attack":1,"defence":0,"class":"speedy","maxRez":0,"curRez":0,"effect":"Does 1d6 Damage direct to a Netrunner's brain and lowers the amount of total NET Actions the Netrunner can accomplish on their next Turn by 1 (minimum 2)."}
+	
+	];
+	var ownedPrograms=[0,1,2,3,4,5,6,7,2];
 	/*
 	var slots=[
 	{"name":"Blank","attack":0,"defence":0,"class":"","maxRez":0,"curRez":0},
@@ -94,7 +103,7 @@
 	function addToSideBar(elem)
 	{
 		var id=parseInt(elem.getAttribute("data-prog"));
-		var prog=programs[id];
+		var prog=allPrograms[ownedPrograms[id]];
 		var nextOpen=document.querySelectorAll("#sidebar .chip.blank");
 		if(nextOpen.length==0)
 		{
