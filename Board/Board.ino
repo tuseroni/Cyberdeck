@@ -60,14 +60,17 @@ if(val>0)
 }
 else
 {
-  num=-1;  
+  num=0xff;  
 }
 /*Serial.print("Received Number: ");
 Serial.print(num);
 Serial.print("\n");*/
+char data[7]={0xff,0xff,0xff,0xff,0xff,0xff,0xff};
+data[0]=(char)num;
 if(num!=lastNum)
 {
-  Serial.print(num);
+  Serial.print(data);
+  lastNum=num;
 }
 
   int i=0;
