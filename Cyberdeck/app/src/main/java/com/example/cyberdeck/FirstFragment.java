@@ -25,8 +25,6 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.cyberdeck.databinding.FragmentFirstBinding;
-import com.physicaloid.lib.Physicaloid;
-import com.physicaloid.lib.usb.driver.uart.ReadLisener;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
@@ -36,7 +34,6 @@ public class FirstFragment extends Fragment
         implements Runnable{
 
     private FragmentFirstBinding binding;
-    Physicaloid mPhysicaloid;
     private static final int targetVendorID = 0x1A86; //Arduino Uno
     private static final int targetProductID = 0x7523; //Arduino Uno, not 0067
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
@@ -274,49 +271,6 @@ public class FirstFragment extends Fragment
         }
 
     };
-    public byte[] header=new byte[]{(byte)0xde,(byte)0xad,(byte)0xfe,(byte)0xed};
-    public boolean getByte(byte[] buf)
-    {
-        int numRead=usbDeviceConnection.bulkTransfer(endpointIn,
-                buf, 1, 1000);
-        if(numRead<=0)
-        {
-            return false;
-        }
-        return true;
-    }
-    public boolean readToHeader(byte[] buf)
-    {
-        byte[] bt=new byte[]{(byte)0x00};
-        int index=0;
-        int bytesRead=0;
-        while(getByte(bt))
-        {
-
-            if(bt[0]==header[index])
-            {
-                index++;
-            }
-            else if(index>0 && index<3)
-            {
-                index=0;
-            }
-        }
-        if(index==3)
-        {
-            buf[0]=bt[0];
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-
-    }
-    public boolean peakByte(byte[] buff)
-    {
-        return getByte(buff);
-    }
 
     int state=0;
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -400,7 +354,7 @@ public class FirstFragment extends Fragment
             if(numRead>0)
             {
                 for (int i = 0; i < numRead; i++) {
-                    logString += String.format("%02d", buf[i]) + " ";
+                    logString += buf[i] + " ";
                 }
 
 

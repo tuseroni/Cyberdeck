@@ -17,8 +17,7 @@ import com.example.cyberdeck.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
-import com.physicaloid.lib.Physicaloid;
-import com.physicaloid.lib.usb.driver.uart.ReadLisener;
+
 
 public class MainActivity extends AppCompatActivity {
 
