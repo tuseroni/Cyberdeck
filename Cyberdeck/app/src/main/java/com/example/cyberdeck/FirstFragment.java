@@ -274,7 +274,49 @@ public class FirstFragment extends Fragment
         }
 
     };
+    public byte[] header=new byte[]{(byte)0xde,(byte)0xad,(byte)0xfe,(byte)0xed};
+    public boolean getByte(byte[] buf)
+    {
+        int numRead=usbDeviceConnection.bulkTransfer(endpointIn,
+                buf, 1, 1000);
+        if(numRead<=0)
+        {
+            return false;
+        }
+        return true;
+    }
+    public boolean readToHeader(byte[] buf)
+    {
+        byte[] bt=new byte[]{(byte)0x00};
+        int index=0;
+        int bytesRead=0;
+        while(getByte(bt))
+        {
 
+            if(bt[0]==header[index])
+            {
+                index++;
+            }
+            else if(index>0 && index<3)
+            {
+                index=0;
+            }
+        }
+        if(index==3)
+        {
+            buf[0]=bt[0];
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+    public boolean peakByte(byte[] buff)
+    {
+        return getByte(buff);
+    }
 
     int state=0;
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -284,8 +326,10 @@ public class FirstFragment extends Fragment
             @Override
             public void onClick(View view) {
                 state= (state + 1) % 3;
-                byte[] buf = ("01"+state).getBytes();
+                byte[] buf = {(byte)48,(byte)49,(byte)(48+state)};
                 try {
+                    String val=""+buf[2];
+                    binding.textStatus.setText(binding.textStatus.getText()+"setting val "+val);
                     usbDeviceConnection.bulkTransfer(endpointOut,
                             buf, buf.length, 0);
                 }
@@ -327,14 +371,15 @@ public class FirstFragment extends Fragment
     @Override
     public void run() {
         RxState = RX_STATE_0_IDLE;
-        byte[] buf = new byte[7];
+        byte[] buf = new byte[255];
+        int numRead=0;
 
 //        ByteBuffer buffer = ByteBuffer.allocate(7);
 //        UsbRequest request = new UsbRequest();
 //        request.initialize(usbDeviceConnection, endpointIn);
         while (true) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                usbDeviceConnection.bulkTransfer(endpointIn,buf,0,7,0);
+                numRead=usbDeviceConnection.bulkTransfer(endpointIn,buf,0,255,1000);
             }
             else
             {
@@ -352,21 +397,23 @@ public class FirstFragment extends Fragment
 //                byte[] buf= buffer.array();
 //
 //
-            for(int i =0; i<buf.length;i++)
+            if(numRead>0)
             {
-                logString += String.format("%02d", buf[i]) + " ";
-            }
+                for (int i = 0; i < numRead; i++) {
+                    logString += String.format("%02d", buf[i]) + " ";
+                }
 
 
-                getActivity().runOnUiThread(new Runnable(){
+                getActivity().runOnUiThread(new Runnable() {
 
                     @Override
                     public void run() {
 
-                        binding.textStatus.setText(binding.textStatus.getText()+logString+"\n");
-                        logString="";
-                    }});
-
+                        binding.textStatus.setText(binding.textStatus.getText() + logString + "\n");
+                        logString = "";
+                    }
+                });
+            }
 
 //            }else{
 //                break;

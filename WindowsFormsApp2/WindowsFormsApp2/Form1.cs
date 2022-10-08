@@ -14,7 +14,7 @@ namespace WindowsFormsApp2
 {
     public partial class Form1 : Form
     {
-        SerialPort _serialPort = new SerialPort("COM5", 9600, Parity.None, 8, StopBits.One);
+        SerialPort _serialPort = new SerialPort("COM7", 9600, Parity.None, 8, StopBits.One);
         Dictionary<string, Image> classes = new Dictionary<string, Image>()
         {
             {"blank",Properties.Resources.alpha1 },
@@ -24,7 +24,9 @@ namespace WindowsFormsApp2
             {"eraser",Properties.Resources.eraser },
             {"cya",Properties.Resources.cya },
             {"worm",Properties.Resources.worm },
-            {"banhammer",Properties.Resources.banhammer}
+            {"speedy",Properties.Resources.banhammer},
+            {"banhammer",Properties.Resources.banhammer},
+            {"shield",Properties.Resources.banhammer}
         };
         prog[] allPrograms = {
             new prog(){name="Blank", attack=0, defence=0, Class="blank", maxRez=0, curRez=0, effect=""},
@@ -76,6 +78,11 @@ namespace WindowsFormsApp2
             var port = data[0];
             if (port == 0xff)
             {
+                port = 0;
+            }
+            if(port>allPrograms.Length)
+            {
+                Console.WriteLine(port);
                 port = 0;
             }
             var program = allPrograms[port];

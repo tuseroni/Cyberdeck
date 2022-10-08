@@ -1,78 +1,97 @@
-/*
-  Blink
+//**************************************************************//
+//  Name    : shiftIn Example 1.1                              //
+//  Author  : Carlyn Maw                                        //
+//  Date    : 25 Jan, 2007                                      //
+//  Version : 1.0                                               //
+//  Notes   : Code for using a CD4021B Shift Register       //
+//          :                                                   //
+//****************************************************************
 
-  Turns an LED on for one second, then off for one second, repeatedly.
-
-  Most Arduinos have an on-board LED you can control. On the UNO, MEGA and ZERO
-  it is attached to digital pin 13, on MKR1000 on pin 6. LED_BUILTIN is set to
-  the correct LED pin independent of which board is used.
-  If you want to know what pin the on-board LED is connected to on your Arduino
-  model, check the Technical Specs of your board at:
-  https://www.arduino.cc/en/Main/Products
-
-  modified 8 May 2014
-  by Scott Fitzgerald
-  modified 2 Sep 2016
-  by Arturo Guadalupi
-  modified 8 Sep 2016
-  by Colby Newman
-
-  This example code is in the public domain.
-
-  https://www.arduino.cc/en/Tutorial/BuiltInExamples/Blink
-*/
-
-const int pin_red=10;
-const int pin_green=11;
+//define where your pins are
+int latchPin = 2;
+int dataPin = 3;
+int clockPin = 4;
+const int pin_red=11;
+const int pin_green=12;
+byte data[7]={0xff,0xff,0xff,0xff,0xff,0xff,0xff};
 char readString[255]="";
-void setup() {
-pinMode(2,OUTPUT);
-pinMode(pin_red,OUTPUT);
-pinMode(pin_green,OUTPUT);
-pinMode(3,OUTPUT);
-pinMode(4,INPUT);
-pinMode(5,INPUT);
-pinMode(6,INPUT);
-pinMode(7,INPUT);
-pinMode(8,INPUT);
-pinMode(9,INPUT);
-Serial.begin(9600);
-}
 int lastNum=0;
-bool chipIn=false;
+//Define variables to hold the data
+//for shift register.
+//starting with a non-zero numbers can help
+//troubleshoot
+byte switchVar1 = 72;  //01001000
+
+void setup() {
+
+  //start serial
+
+  Serial.begin(9600);
+
+  //define pin modes
+
+  pinMode(latchPin, OUTPUT);
+
+  pinMode(clockPin, OUTPUT);
+
+  pinMode(dataPin, INPUT);
+  pinMode(pin_red,OUTPUT);
+  pinMode(pin_green,OUTPUT);
+
+}
+
 void loop() {
 
-int num=0;
+  //Pulse the latch pin:
 
-int val = 0;
-digitalWrite(2,HIGH);//power
-val=digitalRead(9);//return
 
-if(val>0)
+  digitalWrite(clockPin,HIGH);
+  //set it to 1 to collect parallel data
+
+  digitalWrite(latchPin,LOW);
+
+  //set it to 1 to collect parallel data, wait
+
+  delayMicroseconds(20);
+
+  //set it to 0 to transmit data serially
+
+  digitalWrite(latchPin,HIGH);
+
+  //while the shift register is in serial mode
+
+  //collect each shift register into a byte
+
+  //the register attached to the chip comes in first
+
+  switchVar1 = shiftIn(dataPin, clockPin,LSBFIRST);
+  int num=0;
+  bool chipIn=switchVar1&1;
+  num=switchVar1>>1;
+  if(chipIn)
+  {
+    data[0]=num;
+  }
+  else
+  {
+    data[0]=0xff;
+  }
+  if(num!=lastNum)
 {
-  //Serial.print("Chip In, ");
-  num=digitalRead(3); //1'2
-  num|=digitalRead(4)<<1;//2'2
-  num|=digitalRead(5)<<2;//4'2
-  num|=digitalRead(6)<<3;//8'2
-  num|=digitalRead(7)<<4;//16'2
-  num|=digitalRead(8)<<5;//32'2
-}
-else
-{
-  num=0xff;  
-}
-/*Serial.print("Received Number: ");
-Serial.print(num);
-Serial.print("\n");*/
-char data[7]={0xff,0xff,0xff,0xff,0xff,0xff,0xff};
-data[0]=(char)num;
-if(num!=lastNum)
-{
-  Serial.print(data);
+  //Serial.print("data: ");
+  Serial.write(data,7);
   lastNum=num;
 }
+  
+  //Print out the results.
 
+  //leading 0's at the top of the byte
+
+  //(7, 6, 5, etc) will be dropped before
+
+  //the first pin that has a high input
+
+  //reading
   int i=0;
  while (Serial.available()) {
     delay(2);  //delay to allow byte to arrive in input buffer
@@ -80,21 +99,16 @@ if(num!=lastNum)
     readString[i] = c;
     i++;
   }
+  
 
   
   int port=(readString[0]-'0')*10+(readString[1]-'0');
   int state=readString[2]-'0';
-  
-  
   if(i>0)
   {
-    //Serial.print("Chip Number is: ");
-    /*Serial.print("Received Command, Setting: Port ");
-    Serial.print(port);
-    Serial.print(" to ");
-    Serial.print(state);
-    Serial.print("\n");*/
+    //Serial.write(readString,7);
   }
+
   if(state==1)
   {
     set_outputs_plus_ground(pin_red,pin_green);
@@ -108,17 +122,10 @@ if(num!=lastNum)
     digitalWrite(pin_green,LOW);  
     digitalWrite(pin_red,LOW);
   }
-  
 
+  delay(500);
 
-/*
-  set_outputs_plus_ground(pin_red,pin_green);
-delay(1000);
-  set_outputs_plus_ground(pin_green,pin_red);   
-delay(1000);*/
-
-           }
-
+}
 void set_outputs_plus_ground(int pin_plus, int pin_ground)
 {
   //set both pins low first so you don't have them pushing 5 volts into eachother
@@ -126,4 +133,4 @@ void set_outputs_plus_ground(int pin_plus, int pin_ground)
   digitalWrite(pin_ground,LOW);
   //set output pin as high
   digitalWrite(pin_plus,HIGH);  
-  } 
+} 
