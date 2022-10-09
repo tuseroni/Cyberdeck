@@ -14,6 +14,7 @@ import android.hardware.usb.UsbManager;
 import android.hardware.usb.UsbRequest;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.cyberdeck.databinding.FragmentFirstBinding;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -81,6 +83,57 @@ public class FirstFragment extends Fragment
         }
 
     }
+    private int controlOut(int request, int value, int index) {
+        final int REQTYPE_HOST_TO_DEVICE = UsbConstants.USB_TYPE_VENDOR | UsbConstants.USB_DIR_OUT;
+        return usbDeviceConnection.controlTransfer(REQTYPE_HOST_TO_DEVICE, request,
+                value, index, null, 0, 5000);
+    }
+
+
+    private int controlIn(int request, int value, int index, byte[] buffer) {
+        final int REQTYPE_DEVICE_TO_HOST = UsbConstants.USB_TYPE_VENDOR | UsbConstants.USB_DIR_IN;
+        return usbDeviceConnection.controlTransfer(REQTYPE_DEVICE_TO_HOST, request,
+                value, index, buffer, buffer.length, 5000);
+    }
+
+    private void setBaudRate(int baudRate) throws IOException {
+        long factor;
+        long divisor;
+
+        if (baudRate == 921600) {
+            divisor = 7;
+            factor = 0xf300;
+        } else {
+            final long BAUDBASE_FACTOR = 1532620800;
+            final int BAUDBASE_DIVMAX = 3;
+
+
+            factor = BAUDBASE_FACTOR / baudRate;
+            divisor = BAUDBASE_DIVMAX;
+            while ((factor > 0xfff0) && divisor > 0) {
+                factor >>= 3;
+                divisor--;
+            }
+            if (factor > 0xfff0) {
+                throw new UnsupportedOperationException("Unsupported baud rate: " + baudRate);
+            }
+            factor = 0x10000 - factor;
+        }
+
+        divisor |= 0x0080; // else ch341a waits until buffer full
+        int val1 = (int) ((factor & 0xff00) | divisor);
+        int val2 = (int) (factor & 0xff);
+        Log.d("foo", String.format("baud rate=%d, 0x1312=0x%04x, 0x0f2c=0x%04x", baudRate, val1, val2));
+        int ret = controlOut(0x9a, 0x1312, val1);
+        if (ret < 0) {
+            throw new IOException("Error setting baud rate: #1)");
+        }
+        ret = controlOut(0x9a, 0x0f2c, val2);
+        if (ret < 0) {
+            throw new IOException("Error setting baud rate: #2");
+        }
+    }
+
     private boolean setupUsbComm() {
 
         // for more info, search SET_LINE_CODING and
@@ -107,12 +160,20 @@ public class FirstFragment extends Fragment
                         null, // buffer
                         0, // length
                         0); // timeout
-
+                try {
+                    setBaudRate(9600);
+                }
+                catch(Exception e)
+                {
+                    Toast.makeText(getContext(),"Failed to set BAUD rate",Toast.LENGTH_SHORT);
+                }
                 // baud rate = 9600
                 // 8 data bit
                 // 1 stop bit
-                byte[] encodingSetting = new byte[] { (byte) 0x80, 0x25, 0x00,
+                /*byte[] encodingSetting = new byte[] { (byte) 0x80, 0x25, 0x00,
                         0x00, 0x00, 0x00, 0x08 };
+                /*byte[] encodingSetting = new byte[] { (byte) 0x00, (byte)0x00, (byte)0x25, (byte)0x80,
+                        (byte)0x00, (byte)0x00, (byte)0x08 };
                 usbDeviceConnection.controlTransfer(0x21, // requestType
                         RQSID_SET_LINE_CODING, // SET_LINE_CODING
                         0, // value
@@ -120,7 +181,7 @@ public class FirstFragment extends Fragment
                         encodingSetting, // buffer
                         7, // length
                         0); // timeout
-
+                */
                 //2015-04-15
                 Thread thread = new Thread(this);
                 thread.start();
@@ -326,12 +387,13 @@ public class FirstFragment extends Fragment
     public void run() {
         RxState = RX_STATE_0_IDLE;
         byte[] buf = new byte[255];
-        int numRead=0;
+
 
 //        ByteBuffer buffer = ByteBuffer.allocate(7);
 //        UsbRequest request = new UsbRequest();
 //        request.initialize(usbDeviceConnection, endpointIn);
         while (true) {
+            int numRead=0;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 numRead=usbDeviceConnection.bulkTransfer(endpointIn,buf,0,255,1000);
             }
